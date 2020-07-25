@@ -5,7 +5,6 @@
     <meta http-equiv='X-UA-Compatible' content='IE=edge'>
     <title>Teste CSV</title>
     <meta name='viewport' content='width=device-width, initial-scale=1'>
-    <link rel='stylesheet' type='text/css' media='screen' href='main.css'>
     <link href="https://fonts.googleapis.com/css?family=Lato|Roboto|Source+Code+Pro" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.6/styles/monokai.min.css">
 </head>
@@ -14,20 +13,30 @@
     <div id="container">
         <section id="content">
           <h2>Entrada</h2>
-          <textarea id="input" style="height: 190px; width: 100%"></textarea>
+          <input type="file" id="inputCSV" onchange="pegaCSV(this)">
           <hr />
-          <input id="run" type="button" value="Converter" />
+          <h2>Carregando em formato tabela:</h2>
+          <div id="CSVsaida"></div>
+          <hr />
+          <h2>Carregando entrada dentro do textarea:</h2>
+          <hr />
+          <textarea id="entrada" style="height: 70px; width: 100%"></textarea>
+          <hr />
+          <input id="run" type="button" value="Converter em Object/JSON" />
           <hr />
           <h2>Resultado</h2>
-          <textarea id="result" style="height: 200px; width: 100%"></textarea>
+          <textarea id="result" style="height: 400px; width: 100%"></textarea>
         </section>
       </div>
+
+      <h1><center> Feito com <span style="color: red;">s2</span> por <block>Pedro Azevedo.</block></center></h1>
     
     <script src="https://code.jquery.com/jquery-3.5.1.min.js" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
     <script src="jquery.csv.js"></script>
+    <script src="https://rawgit.com/mholt/PapaParse/master/papaparse.min.js"></script>
     <script>
 
-  
+        
         $(document).ready(() => {
           parse();
         });
@@ -35,12 +44,44 @@
         $('#run').bind('click', function () {
           parse();
         });
-  
+
         function parse() {
-          const input = $('#input').val();
+          const input = $('#entrada').val();
           const data = $.csv.toObjects(input);
           $('#result').empty();
           $('#result').html(JSON.stringify(data, null, 2));
+        }
+
+        var leitorDeCSV = new FileReader();
+
+        window.onload = function init() {
+            leitorDeCSV.onload = leCSV;
+        }
+
+        function pegaCSV(inputFile) {
+            var file = inputFile.files[0];
+            leitorDeCSV.readAsText(file);
+        }
+
+        function leCSV(evt) {
+
+            var fileArr = evt.target.result.split('\n');
+            $('#entrada').html(fileArr);
+            var strDiv = '<table>';
+            
+            for (var i=0; i<fileArr.length; i++) {
+                strDiv += '<tr>';
+                var fileLine = fileArr[i].split(',');
+                    for (var j=0; j<fileLine.length; j++) {
+                        strDiv += '<td>'+fileLine[j].trim()+'</td>';
+                    }
+                strDiv += '</tr>';
+            }
+            
+            strDiv += '</table>';
+            
+            var CSVsaida = document.getElementById('CSVsaida');
+                CSVsaida.innerHTML = strDiv;
         }
       </script>
 </body>
